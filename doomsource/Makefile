@@ -16,7 +16,7 @@ LDFLAGS=-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1 -s EXIT_RUNTIME=1 -s 
 LIBS=-lm
 
 # Subdirectory for objects
-O=linux
+O=build
 
 
 # Object files to compile
@@ -87,10 +87,11 @@ all: $(O)/doom.html
 
 clean:
 	rm -f *.o *~ *.flc
-	rm -rf linux/*
+	rm -rf build/*
 
 $(O)/doom.html:	$(OBJS) $(O)/i_main.o
 	$(CC) $(OBJS) $(O)/i_main.o -o $(O)/doom.html $(LDFLAGS) $(LIBS)
+	cp $(O)/doom.wasm $(O)/doom.data $(O)/doom.js ../testing/
 
 $(O)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

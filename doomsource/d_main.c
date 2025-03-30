@@ -669,7 +669,7 @@ void IdentifyVersion (void)
 	return;
     }
 
-    if ( false )
+    if ( true )
     {
       gamemode = shareware;
       D_AddFile (doom1wad); //shareware
@@ -682,7 +682,7 @@ void IdentifyVersion (void)
       D_AddFile (doomwad); //original doom DOOM.WAD
       return;
     }
-    if ( true )
+    if ( false )
     {
       gamemode = retail;
     //   D_AddFile (doomuwad);
