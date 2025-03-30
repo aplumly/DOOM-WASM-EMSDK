@@ -24,7 +24,6 @@
 //
 //-----------------------------------------------------------------------------
 
-
 static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 
 #define	BGCOLOR		7
@@ -39,7 +38,14 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #include <sys/stat.h>
 #include <fcntl.h>
 #endif
+#include <emscripten.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
 
 #include "doomdef.h"
 #include "doomstat.h"
@@ -101,8 +107,6 @@ boolean         drone;
 
 boolean		singletics = false; // debug flag to cancel adaptiveness
 
-
-
 //extern int soundVolume;
 //extern  int	sfxVolume;
 //extern  int	musicVolume;
@@ -131,7 +135,6 @@ void D_ProcessEvents (void);
 void G_BuildTiccmd (ticcmd_t* cmd);
 void D_DoAdvanceDemo (void);
 
-
 //
 // EVENT HANDLING
 //
@@ -141,7 +144,6 @@ void D_DoAdvanceDemo (void);
 event_t         events[MAXEVENTS];
 int             eventhead;
 int 		eventtail;
-
 
 //
 // D_PostEvent
@@ -272,7 +274,9 @@ void D_Display (void)
     
     // clean up border stuff
     if (gamestate != oldgamestate && gamestate != GS_LEVEL)
+    {
 	I_SetPalette (W_CacheLumpName ("PLAYPAL",PU_CACHE));
+    }
 
     // see if the border needs to be initially drawn
     if (gamestate == GS_LEVEL && oldgamestate != GS_LEVEL)
@@ -344,7 +348,34 @@ void D_Display (void)
     } while (!done);
 }
 
+void one_iter(void) {
+    // Your single-frame logic goes here, extracted from D_DoomLoop()
+    I_StartFrame();
 
+    if (singletics) {
+        I_StartTic();
+        D_ProcessEvents();
+        G_BuildTiccmd(&netcmds[consoleplayer][maketic % BACKUPTICS]);
+        if (advancedemo)
+            D_DoAdvanceDemo();
+        M_Ticker();
+        G_Ticker();
+        gametic++;
+        maketic++;
+    } else {
+        TryRunTics();
+    }
+
+    S_UpdateSounds(players[consoleplayer].mo);
+    D_Display();
+
+#ifndef SNDSERV
+    I_UpdateSound();
+#endif
+#ifndef SNDINTR
+    I_SubmitSound();
+#endif
+}
 
 //
 //  D_DoomLoop
@@ -368,41 +399,7 @@ void D_DoomLoop (void)
 
     while (1)
     {
-	// frame syncronous IO operations
-	I_StartFrame ();                
-	
-	// process one or more tics
-	if (singletics)
-	{
-	    I_StartTic ();
-	    D_ProcessEvents ();
-	    G_BuildTiccmd (&netcmds[consoleplayer][maketic%BACKUPTICS]);
-	    if (advancedemo)
-		D_DoAdvanceDemo ();
-	    M_Ticker ();
-	    G_Ticker ();
-	    gametic++;
-	    maketic++;
-	}
-	else
-	{
-	    TryRunTics (); // will run at least one tic
-	}
-		
-	S_UpdateSounds (players[consoleplayer].mo);// move positional sounds
-
-	// Update display, next frame, with current state.
-	D_Display ();
-
-#ifndef SNDSERV
-	// Sound mixing for the buffer is snychronous.
-	I_UpdateSound();
-#endif	
-	// Synchronous sound output is explicitly called.
-#ifndef SNDINTR
-	// Update sound output.
-	I_SubmitSound();
-#endif
+        emscripten_set_main_loop(one_iter, 0, 1);
     }
 }
 
@@ -414,7 +411,6 @@ void D_DoomLoop (void)
 int             demosequence;
 int             pagetic;
 char                    *pagename;
-
 
 //
 // D_PageTicker
@@ -544,7 +540,9 @@ void D_AddFile (char *file)
 {
     int     numwadfiles;
     char    *newfile;
-	
+	printf("new file added! : ");
+    printf(file);
+    printf("\n");
     for (numwadfiles = 0 ; wadfiles[numwadfiles] ; numwadfiles++)
 	;
 
@@ -573,11 +571,16 @@ void IdentifyVersion (void)
     char*	tntwad;
 
 #ifdef NORMALUNIX
+
+
+    if (!getenv("DOOMWADDIR"))
+    setenv("DOOMWADDIR", "/wad", 1);
     char *home;
     char *doomwaddir;
     doomwaddir = getenv("DOOMWADDIR");
+    
     if (!doomwaddir)
-	doomwaddir = ".";
+	doomwaddir = "/wad";
 
     // Commercial.
     doom2wad = malloc(strlen(doomwaddir)+1+9+1);
@@ -589,11 +592,11 @@ void IdentifyVersion (void)
     
     // Registered.
     doomwad = malloc(strlen(doomwaddir)+1+8+1);
-    sprintf(doomwad, "%s/doom.wad", doomwaddir);
-    
+    sprintf(doomwad, "%s/DOOM.WAD", doomwaddir);
+
     // Shareware.
     doom1wad = malloc(strlen(doomwaddir)+1+9+1);
-    sprintf(doom1wad, "%s/doom1.wad", doomwaddir);
+    sprintf(doom1wad, "%s/DOOM1.WAD", doomwaddir);
 
      // Bug, dear Shawn.
     // Insufficient malloc, caused spurious realloc errors.
@@ -609,13 +612,22 @@ void IdentifyVersion (void)
     sprintf(doom2fwad, "%s/doom2f.wad", doomwaddir);
 
     home = getenv("HOME");
+
     if (!home)
       I_Error("Please set $HOME to your home directory");
     sprintf(basedefault, "%s/.doomrc", home);
 #endif
 
+
+
+
+
+
+
+
     if (M_CheckParm ("-shdev"))
     {
+    printf("shareware\n");
 	gamemode = shareware;
 	devparm = true;
 	D_AddFile (DEVDATA"doom1.wad");
@@ -627,6 +639,7 @@ void IdentifyVersion (void)
 
     if (M_CheckParm ("-regdev"))
     {
+    printf("registered\n");
 	gamemode = registered;
 	devparm = true;
 	D_AddFile (DEVDATA"doom.wad");
@@ -639,6 +652,7 @@ void IdentifyVersion (void)
 
     if (M_CheckParm ("-comdev"))
     {
+    printf("commercial\n");
 	gamemode = commercial;
 	devparm = true;
 	/* I don't bother
@@ -655,7 +669,28 @@ void IdentifyVersion (void)
 	return;
     }
 
-    if ( !access (doom2fwad,R_OK) )
+    if ( false )
+    {
+      gamemode = shareware;
+      D_AddFile (doom1wad); //shareware
+      return;
+    }
+
+    if ( false )
+    {
+      gamemode = registered;
+      D_AddFile (doomwad); //original doom DOOM.WAD
+      return;
+    }
+    if ( true )
+    {
+      gamemode = retail;
+    //   D_AddFile (doomuwad);
+      D_AddFile(doomwad); //ultimate doom. only seen this distributed as DOOM.WAD. differs from original DOOM.WAD. Crashes if the HELP2 DEMO screen is called.
+      return;
+    }
+
+    if ( false )
     {
 	gamemode = commercial;
 	// C'est ridicule!
@@ -666,47 +701,31 @@ void IdentifyVersion (void)
 	return;
     }
 
-    if ( !access (doom2wad,R_OK) )
+    if ( false )
     {
 	gamemode = commercial;
 	D_AddFile (doom2wad);
 	return;
     }
 
-    if ( !access (plutoniawad, R_OK ) )
-    {
+    if ( false )
+    { 
       gamemode = commercial;
       D_AddFile (plutoniawad);
       return;
     }
 
-    if ( !access ( tntwad, R_OK ) )
+    if ( false )
     {
       gamemode = commercial;
       D_AddFile (tntwad);
       return;
     }
 
-    if ( !access (doomuwad,R_OK) )
-    {
-      gamemode = retail;
-      D_AddFile (doomuwad);
-      return;
-    }
 
-    if ( !access (doomwad,R_OK) )
-    {
-      gamemode = registered;
-      D_AddFile (doomwad);
-      return;
-    }
 
-    if ( !access (doom1wad,R_OK) )
-    {
-      gamemode = shareware;
-      D_AddFile (doom1wad);
-      return;
-    }
+
+
 
     printf("Game mode indeterminate.\n");
     gamemode = indetermined;
@@ -1137,14 +1156,14 @@ void D_DoomMain (void)
     {
 	singledemo = true;              // quit after one demo
 	G_DeferedPlayDemo (myargv[p+1]);
-	D_DoomLoop ();  // never returns
+	D_DoomLoop();  // never returns
     }
 	
     p = M_CheckParm ("-timedemo");
     if (p && p < myargc-1)
     {
 	G_TimeDemo (myargv[p+1]);
-	D_DoomLoop ();  // never returns
+	D_DoomLoop();  // never returns
     }
 	
     p = M_CheckParm ("-loadgame");
@@ -1167,5 +1186,5 @@ void D_DoomMain (void)
 
     }
 
-    D_DoomLoop ();  // never returns
+    D_DoomLoop();  // never returns
 }

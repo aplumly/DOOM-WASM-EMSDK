@@ -1,0 +1,15 @@
+# Ignore WAD files and build directories
+**/wad/
+**/linux/
+**/build/
+
+# Ignore node dependencies
+**/node_modules/
+
+# Common OS files (optional but recommended)
+.DS_Store
+Thumbs.db
+
+# Ignore Emscripten intermediate files (optional)
+*.o
+*.wasm.*

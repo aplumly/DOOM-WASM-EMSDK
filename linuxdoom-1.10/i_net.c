@@ -73,7 +73,8 @@ boolean NetListen (void);
 // NETWORKING
 //
 
-int	DOOMPORT =	(IPPORT_USERRESERVED +0x1d );
+#define IPPORT_USERRESERVED 5000  // Pick a valid port number
+int DOOMPORT = (IPPORT_USERRESERVED + 0x1d);
 
 int			sendsocket;
 int			insocket;

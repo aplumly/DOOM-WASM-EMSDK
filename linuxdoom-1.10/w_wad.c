@@ -37,7 +37,7 @@ rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 #include <alloca.h>
 #define O_BINARY		0
 #endif
-
+#include <errno.h>
 #include "doomtype.h"
 #include "m_swap.h"
 #include "i_system.h"
@@ -66,7 +66,7 @@ void**			lumpcache;
 
 #define strcmpi	strcasecmp
 
-void strupr (char* s)
+void struprD (char* s)
 {
     while (*s) { *s = toupper(*s); s++; }
 }
@@ -163,6 +163,7 @@ void W_AddFile (char *filename)
     if ( (handle = open (filename,O_RDONLY | O_BINARY)) == -1)
     {
 	printf (" couldn't open %s\n",filename);
+    printf("errno = %d\n", errno);
 	return;
     }
 
@@ -367,7 +368,7 @@ int W_CheckNumForName (char* name)
     name8.s[8] = 0;
 
     // case insensitive
-    strupr (name8.s);		
+    struprD (name8.s);		
 
     v1 = name8.x[0];
     v2 = name8.x[1];
