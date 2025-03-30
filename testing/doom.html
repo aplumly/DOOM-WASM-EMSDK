@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <title>DOOM WebAssembly</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: black;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #canvas {
+        display: block;
+        width: 960px;
+        height: 600px;
+        image-rendering: pixelated;
+        margin-top: 20px;
+      }
+      #output {
+        width: 960px;
+        height: 120px;
+        background-color: #111;
+        color: #0f0;
+        font-family: monospace;
+        font-size: 14px;
+        padding: 10px;
+        overflow-y: auto;
+        box-sizing: border-box;
+        margin-top: 10px;
+        border: 1px solid #333;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+    <div id="output"></div>
+
+    <script>
+      var Module = {
+        canvas: document.getElementById('canvas'),
+        print: function(text) {
+          var output = document.getElementById('output');
+          output.innerHTML += text + '<br>';
+          output.scrollTop = output.scrollHeight;
+        }
+      };
+    </script>
+
+    <script async src="doom.js"></script>
+
+    <script>
+      document.getElementById("canvas").onclick = function() {
+          this.requestPointerLock = this.requestPointerLock || this.mozRequestPointerLock;
+          this.requestPointerLock();
+      };
+
+      document.addEventListener('pointerlockchange', function() {
+          var locked = document.pointerLockElement === document.getElementById("canvas");
+          console.log("Pointer lock status:", locked);
+      }, false);
+    </script>
+  </body>
+</html>

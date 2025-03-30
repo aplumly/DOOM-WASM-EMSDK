@@ -13,3 +13,5 @@ Thumbs.db
 # Ignore Emscripten intermediate files (optional)
 *.o
 *.wasm.*
+**/doom.js
+*.data
