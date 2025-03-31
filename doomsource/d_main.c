@@ -669,6 +669,11 @@ void IdentifyVersion (void)
 	return;
     }
 
+    //this is hacky, but works for now. replaced Access checks with simple booleans.
+    //just set the version you'd like to build to true and the others to false.
+    //make sure the the .wad filename matches what is stored in the variables about 50 lines up from here. 
+    //this could be done so much better.
+
     if ( true )
     {
       gamemode = shareware;
@@ -684,9 +689,9 @@ void IdentifyVersion (void)
     }
     if ( false )
     {
-      gamemode = retail;
+      gamemode = retail; //if gamemode = retail, HELP2 demo screen is not referenced.
     //   D_AddFile (doomuwad);
-      D_AddFile(doomwad); //ultimate doom. only seen this distributed as DOOM.WAD. differs from original DOOM.WAD. Crashes if the HELP2 DEMO screen is called.
+      D_AddFile(doomwad); //ultimate doom. only seen this distributed as DOOM.WAD. differs from original DOOM.WAD. Crashes if the HELP2 DEMO screen is called. 
       return;
     }
 
