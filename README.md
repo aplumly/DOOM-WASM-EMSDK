@@ -102,6 +102,6 @@ Now you can access your DOOM WebAssembly game from your browser at `http://local
   - If this fails, the sound code will have to be rewritten to use sdl/sdl2
 - Improve the wad loading/swapping experience. The current solution is hacky.&#x20;
   - the best solution, if possible is to preserve the original code that does this so that the wad files can be swapped in your /wad folder before building .data. 
-- Get networking working for possible multiplayer
+- Get networking for possible multiplayer
   - To get started with this, head to [https://github.com/id-Software/DOOM.git](https://github.com/id-Software/DOOM.git) and grab the networking source material.
 
