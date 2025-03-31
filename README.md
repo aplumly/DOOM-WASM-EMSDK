@@ -90,7 +90,7 @@ Then run the Node.js server:
 node server.js
 ```
 
-Now you can access your DOOM WebAssembly game from your browser at `http://localhost:8000`.
+Now you can access your DOOM WebAssembly game from your browser at `http://localhost:3000`.
 
 ---
 
