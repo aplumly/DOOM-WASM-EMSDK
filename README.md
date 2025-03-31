@@ -1,7 +1,7 @@
 # DOOM-WASM-EMSDK
 
 This is a WebAssembly port of the classic game DOOM, built using Emscripten (emsdk).
-Achieved by modifying [https://github.com/id-Software/DOOM.git](https://github.com/id-Software/DOOM.git)
+##Achieved by modifying [https://github.com/id-Software/DOOM.git](https://github.com/id-Software/DOOM.git)
 Completely reworked i_video.c to use sdl/sdl2 as x11 is not compatible with emsdk.
 Small definition changes were made to allow for compilation.
 Reworked the d_doomloop() to use emscripten_set_main_loop().
@@ -93,7 +93,7 @@ Then run the Node.js server:
 node server.js
 ```
 
-Now you can access your DOOM WebAssembly game from your browser at `http://localhost:8000`.
+Now you can access your DOOM WebAssembly game from your browser at `http://localhost:3000`.
 
 ---
 
