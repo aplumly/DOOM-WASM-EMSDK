@@ -1,10 +1,7 @@
-# DOOM-WASM-EMSDK
+# DOOM WebAssembly Port
 
-This is a WebAssembly port of the classic game DOOM, built using Emscripten (emsdk).
-Achieved by modifying [https://github.com/id-Software/DOOM.git](https://github.com/id-Software/DOOM.git)
-Completely reworked i_video.c to use sdl/sdl2 as x11 is not compatible with emsdk.
-Small definition changes were made to allow for compilation.
-Reworked the d_doomloop() to use emscripten_set_main_loop().
+This is a WebAssembly port of the classic game DOOM, built using Emscripten (emsdk). Achieved by modifying [https://github.com/id-Software/DOOM.git](https://github.com/id-Software/DOOM.git). Completely reworked `i_video.c` to use SDL/SDL2 as X11 is not compatible with emsdk. Small definition changes were made to allow for compilation. Reworked the `D_DoomLoop()` to use `emscripten_set_main_loop()`.
+
 ---
 
 ## Environment Setup (Debian)
@@ -93,16 +90,18 @@ Then run the Node.js server:
 node server.js
 ```
 
-Now you can access your DOOM WebAssembly game from your browser at `http://localhost:8000`.
+Now you can access your DOOM WebAssembly game from your browser at `http://localhost:3000`.
 
 ---
 
 ## TODO
 
 - Get sounds working.
-  - &#x20;may just need to add the sound library to the .data file and set the path correctly in the defines
+  - &#x20;may just need to add the sndserver to the .data file and set the path correctly in the defines. sndserver will have to be compiled. It may be incompatible with emsdk.
+  - [https://github.com/id-Software/DOOM.git](https://github.com/id-Software/DOOM.git) source for sndserver in the original linux source.
+  - If this fails, the sound code will have to be rewritten to use sdl/sdl2
 - Improve the wad loading/swapping experience. The current solution is hacky.&#x20;
   - the best solution, if possible is to preserve the original code that does this so that the wad files can be swapped in your /wad folder before building .data. 
-- Get networking working for possible multiplayer
+- Get networking for possible multiplayer
   - To get started with this, head to [https://github.com/id-Software/DOOM.git](https://github.com/id-Software/DOOM.git) and grab the networking source material.
 
