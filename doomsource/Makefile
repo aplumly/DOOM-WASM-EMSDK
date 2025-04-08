@@ -10,7 +10,7 @@ CC=  emcc  # Use emcc for Emscripten compilation
 CFLAGS=-g -Wall -DNORMALUNIX -DLINUX -s USE_SDL=2 -Wno-unused-variable -Wno-unused-but-set-variable -Wno-enum-compare
 
 # Linking flags (ONLY USED IN FINAL LINKING STEP)
-LDFLAGS=-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1 -s EXIT_RUNTIME=1 -s USE_SDL=2 --preload-file wad@/wad -s EXPORTED_FUNCTIONS="['_main']" -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1
+LDFLAGS=-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1 -s EXIT_RUNTIME=1 -s USE_SDL=2 -s USE_SDL_MIXER=2 --preload-file wad@/wad -s EXPORTED_FUNCTIONS="['_main']" -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1
 
 # Libraries to link
 LIBS=-lm
